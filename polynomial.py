@@ -5,7 +5,7 @@ class Polynomial:
         else:
             if len(coefficients) > 1:
                 coeff_iter = coefficients
-            elif isinstance(coefficients[0], int):
+            elif isinstance(coefficients[0], int) or isinstance(coefficients[0], float):
                 coeff_iter = [coefficients[0], ]
             elif isinstance(coefficients[0], dict):
                 coeff_iter = [0] * (max(coefficients[0]) + 1)
@@ -98,6 +98,18 @@ class Polynomial:
         return answer
 
 
+    def der(self, d=1):
+        if d == 0:
+            return self
+        if self.degree() == 0:
+            return Polynomial(0)
+        first_der = Polynomial(list(map(
+            lambda x: x * self.coefficients[x],
+            list(range(1, self.degree() + 1)))
+        ))
+        return first_der.der(d - 1)
+
+
     def __mul__(self, other):
         a = self
         b = Polynomial(other)
@@ -118,7 +130,7 @@ class Polynomial:
         a = self
         b = Polynomial(other)
         while a.degree() >= b.degree():
-            a = b.coefficients[-1] * a - a.coefficients[-1] * Polynomial({a.degree() - b.degree(): 1}) * b
+            a = a - (a.coefficients[-1] / b.coefficients[-1]) * Polynomial({a.degree() - b.degree(): 1}) * b
             if a == 0:
                 break
         return a
@@ -127,7 +139,7 @@ class Polynomial:
         b = self
         a = Polynomial(other)
         while a.degree() >= b.degree():
-            a = b.coefficients[-1] * a - a.coefficients[-1] * Polynomial({a.degree() - b.degree(): 1}) * b
+            a = a - (a.coefficients[-1] / b.coefficients[-1]) * Polynomial({a.degree() - b.degree(): 1}) * b
             if a == 0:
                 break
         return a
